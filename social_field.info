@@ -1,0 +1,7 @@
+name = Social field
+description = Provides a field for adding social services links.
+core = 7.x
+package = Fields
+configure = admin/config/media/social_field
+
+stylesheets[all][] = css/social_field.css
