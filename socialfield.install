@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * @file
+ * Field schema and uninstall functions for the social_field module.
+ */
+
+/**
+ * Implements hook_field_schema().
+ */
+function socialfield_field_schema($field) {
+  return array(
+    'columns' => array(
+      'service' => array(
+        'type' => 'varchar',
+        'length' => 32,
+      ),
+      'url' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'weight' => array(
+        'type' => 'int',
+        'size' => 'small',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function socialfield_uninstall() {
+  variable_del('socialfield_services');
+}
