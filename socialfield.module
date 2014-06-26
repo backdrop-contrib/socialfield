@@ -72,7 +72,7 @@ function socialfield_settings() {
   );
 
   $rows = array();
-  $services = socialfield_services();
+  $services = variable_get('socialfield_services');
   foreach ($services as $name => $service) {
     $edit = l(
       t('edit'),
@@ -137,7 +137,7 @@ function socialfield_add_service($form, $form_state) {
  * Validates form when adding a new service.
  */
 function socialfield_add_service_validate($form, &$form_state) {
-  $services = socialfield_services();
+  $services = variable_get('socialfield_services');
   if (isset($services[$form_state['values']['service']])) {
     form_set_error('service', t('This service already exist.'));
   }
@@ -148,7 +148,7 @@ function socialfield_add_service_validate($form, &$form_state) {
  */
 function socialfield_add_service_submit($form, $form_state) {
   $values = &$form_state['values'];
-  $services = socialfield_services();
+  $services = variable_get('socialfield_services');
 
   $service = array(
     'name' => $values['service_name'],
@@ -171,7 +171,7 @@ function socialfield_edit_service($form, $form_state, $service = NULL) {
     drupal_goto('admin/config/media/socialfield');
   }
 
-  $services = socialfield_services();
+  $services = variable_get('socialfield_services');
 
   if (!isset($services[$service])) {
     drupal_set_message(t('The specified service does not exist.'), 'error');
@@ -214,7 +214,7 @@ function socialfield_edit_service($form, $form_state, $service = NULL) {
  */
 function socialfield_edit_service_submit($form, $form_state) {
   $values = &$form_state['values'];
-  $services = socialfield_services();
+  $services = variable_get('socialfield_services');
 
   $service = array(
     'name' => $values['service_name'],
@@ -237,7 +237,7 @@ function socialfield_delete_service($form, $form_state, $service = NULL) {
     drupal_goto('admin/config/media/socialfield');
   }
 
-  $services = socialfield_services();
+  $services = variable_get('socialfield_services');
 
   if (!isset($services[$service])) {
     drupal_set_message(t('The specified service does not exist.'), 'error');
@@ -259,7 +259,7 @@ function socialfield_delete_service($form, $form_state, $service = NULL) {
  */
 function socialfield_delete_service_submit($form, $form_state) {
   $values = &$form_state['values'];
-  $services = socialfield_services();
+  $services = variable_get('socialfield_services');
 
   unset($services[$values['service']]);
 
@@ -289,7 +289,7 @@ function socialfield_field_info() {
  * Implements hook_field_instance_settings_form().
  */
 function socialfield_field_instance_settings_form($field, $instance) {
-  $social_services = socialfield_services();
+  $social_services = variable_get('socialfield_services');
   $options = array();
   foreach ($social_services as $name => $service) {
     $options[$name] = $service['name'];
@@ -324,7 +324,7 @@ function socialfield_field_validate($entity_type, $entity, $field, $instance, $l
     return;
   }
 
-  $services = socialfield_services();
+  $services = variable_get('socialfield_services');
   $form_elements = array($field['field_name'], $langcode, 'social_buttons');
   foreach ($items as $delta => &$item) {
     if (!$item['url']) {
@@ -346,94 +346,6 @@ function socialfield_field_validate($entity_type, $entity, $field, $instance, $l
       }
     }
   }
-}
-
-/**
- * All available services.
- *
- * @return
- *   An array of all services.
- */
-function socialfield_services() {
-  $base_services = array(
-    'facebook' => array(
-      'name' => 'Facebook',
-      'icon' => 'icon-facebook',
-      'validation_pattern' => '*facebook.com/*',
-    ),
-    'twitter' => array(
-      'name' => 'Twitter',
-      'icon' => 'icon-twitter',
-      'validation_pattern' => '*twitter.com/*',
-    ),
-    'googleplus' => array(
-      'name' => 'Google+',
-      'icon' => 'icon-gplus',
-      'validation_pattern' => '*plus.google.com/*',
-    ),
-    'linkedin' => array(
-      'name' => 'LinkedIn',
-      'icon' => 'icon-linkedin',
-      'validation_pattern' => '*linkedin.com/*',
-    ),
-    'youtube' => array(
-      'name' => 'YouTube',
-      'icon' => 'icon-youtube',
-      'validation_pattern' => '*youtube.com/*',
-    ),
-    'vimeo' => array(
-      'name' => 'Vimeo',
-      'icon' => 'icon-vimeo',
-      'validation_pattern' => '*vimeo.com/*',
-    ),
-    'delicious' => array(
-      'name' => 'Delicius',
-      'icon' => 'icon-delicious',
-      'validation_pattern' => '*delicious.com/*',
-    ),
-    'digg' => array(
-      'name' => 'Diff',
-      'icon' => 'icon-digg',
-      'validation_pattern' => '*digg.com/*',
-    ),
-    'flickr' => array(
-      'name' => 'Flickr',
-      'icon' => 'icon-flickr',
-      'validation_pattern' => '*flickr.com/*',
-    ),
-    'yahoo' => array(
-      'name' => 'Yahoo!',
-      'icon' => 'icon-yahoo',
-      'validation_pattern' => '*yahoo.com/*',
-    ),
-    'myspace' => array(
-      'name' => 'Myspace',
-      'icon' => 'icon-myspace',
-      'validation_pattern' => '*myspace.com/*',
-    ),
-    'pinterest' => array(
-      'name' => 'Pinterest',
-      'icon' => 'icon-pinterest',
-      'validation_pattern' => '*pinterest.com/*',
-    ),
-    'reddit' => array(
-      'name' => 'Reddit',
-      'icon' => 'icon-reddit',
-      'validation_pattern' => '*reddit.com/*',
-    ),
-    'slideshare' => array(
-      'name' => 'Slideshare',
-      'icon' => 'icon-slideshare',
-      'validation_pattern' => '*slideshare.net/*',
-    ),
-    'stumbleupon' => array(
-      'name' => 'Stumbleupon',
-      'icon' => 'icon-stumbleupon',
-      'validation_pattern' => '*stumbleupon.com/*',
-    ),
-  );
-
-  return variable_get('socialfield_services', $base_services);
 }
 
 /**
@@ -478,7 +390,7 @@ function theme_socialfield_drag_components($vars) {
   $element = $vars['element'];
   drupal_add_tabledrag('socialfield-table', 'order', 'sibling', 'item-row-weight');
 
-  $services = socialfield_services();
+  $services = variable_get('socialfield_services');
 
   $header = array(t('Social links'), '', '', '');
   $rows = array();
@@ -621,7 +533,7 @@ function socialfield_field_widget_form(&$form, &$form_state, $field, $instance, 
   $element['#element_validate'] = array('socialfield_service_validate');
 
   // Getting all services.
-  $social_services = socialfield_services();
+  $social_services = variable_get('socialfield_services');
 
   // Selecting services for the select list.
   $options = array();
@@ -741,7 +653,7 @@ function socialfield_field_formatter_view($entity_type, $entity, $field, $instan
   switch ($display['type']) {
     case 'socialfield_formatter':
       uasort($items, 'drupal_sort_weight');
-      $servicess = socialfield_services();
+      $servicess = variable_get('socialfield_services');
       foreach ($items as $item) {
         // Social link.
         $link = l(

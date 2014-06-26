@@ -4,7 +4,6 @@
  * Implements hook_page_alter().
  */
 function font_icons_page_alter(&$page) {
-	drupal_load('module', 'libraries');
 	libraries_load('fontello');
 }
 

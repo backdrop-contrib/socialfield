@@ -5,7 +5,7 @@ ____________________
 DESCRIPTION
 ____________________
 
-The Social field module provides a social field for services like facebook, twitter, googleplus, linkedin, etc. Social field links are validated according to the patterns inserted in the module configuration.
+The Social field module provides a field that allows you to collect links to social network profiles like facebook, twitter, googleplus, linkedin, etc. Links are shown as icons. Social field links are validated according to the patterns inserted in the module configuration.
 
 For the moment, this module requires fontello icons collection.
 
