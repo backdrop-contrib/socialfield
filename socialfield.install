@@ -63,12 +63,12 @@ function socialfield_install() {
       'validation_pattern' => '*vimeo.com/*',
     ),
     'delicious' => array(
-      'name' => 'Delicius',
+      'name' => 'Delicious',
       'icon' => 'icon-delicious',
       'validation_pattern' => '*delicious.com/*',
     ),
     'digg' => array(
-      'name' => 'Diff',
+      'name' => 'Digg',
       'icon' => 'icon-digg',
       'validation_pattern' => '*digg.com/*',
     ),

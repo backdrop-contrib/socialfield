@@ -320,7 +320,7 @@ function socialfield_field_is_empty($item, $field) {
  */
 function socialfield_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
   // Clicked remove button. No validation needed.
-  if (!$items['validate']) {
+  if (!isset($items['validate_link']) || !$items['validate_link']) {
     return;
   }
 
@@ -596,9 +596,9 @@ function socialfield_service_validate($element, &$form_state) {
   $items = array();
 
   // If remove button was pressed error validation is not necessary.
-  $items['validate'] = TRUE;
+  $items['validate_link'] = TRUE;
   if (isset($form_state['clicked_button']['#socialfield_delete']) ) {
-    $items['validate'] = FALSE;
+    $items['validate_link'] = FALSE;
   }
 
   for ($i=0; $i<$element['#num_elements']; $i++) {
@@ -745,6 +745,6 @@ function socialfield_form_field_ui_field_edit_form_alter(&$form, &$form_state) {
   if ($form['#field']['type'] == 'social_links_field') {
     // Hide the cardinality setting on the field settings for social_links_field fields.
     $form['field']['cardinality']['#default_value'] = FIELD_CARDINALITY_UNLIMITED;
-    $form['field']['#access'] = FALSE;
+    $form['field']['cardinality']['#disabled'] = TRUE;
   }
 }
