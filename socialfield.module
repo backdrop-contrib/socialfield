@@ -342,7 +342,15 @@ function socialfield_field_validate($entity_type, $entity, $field, $instance, $l
       $match = drupal_match_path($item['url'], $services[$item['service']]['validation_pattern']);
       if (!$match) {
         $form_element = array_merge($form_elements, array('element_' . $delta, 'url'));
-        form_set_error(implode('][', $form_element), t("You can't use such URLs."));
+        form_set_error(
+          implode('][', $form_element),
+            t("%service link should match the following pattern: %pattern",
+            array(
+              '%service' => $services[$item['service']]['name'],
+              '%pattern' => $services[$item['service']]['validation_pattern'],
+            )
+          )
+        );
       }
     }
   }
