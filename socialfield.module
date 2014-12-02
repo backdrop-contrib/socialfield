@@ -771,8 +771,43 @@ function socialfield_field_formatter_info() {
     'socialfield_formatter' => array(
       'label' => t('Icons'),
       'field types' => array('social_links_field'),
+      'settings' => array(
+        'link_text' => FALSE,
+      ),
     ),
   );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function socialfield_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  // Getting the view mode where our settings are stored.
+  $display = $instance['display'][$view_mode];
+
+  // Getting the actual settings.
+  $settings = $display['settings'];
+
+  // Initialize the element variable.
+  $element = array();
+  $element['link_text'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Hidden text on link'),
+    '#description' => t('Each icon link will contain his service name as a hidden text. This if useful for screen readers.'),
+    '#default_value'  => $settings['link_text'],
+  );
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function socialfield_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $summary = t('Display links as icons.');
+  return $summary;
 }
 
 /**
@@ -791,8 +826,13 @@ function socialfield_field_formatter_view($entity_type, $entity, $field, $instan
       $servicess = variable_get('socialfield_services');
       foreach ($items as $item) {
         // Social link.
+        $hidden_text = '';
+        if ($display['settings']['link_text']) {
+          // Wanting to set hidden text on link.
+          $hidden_text = '<span class="element-invisible">' . check_plain($item['service']) . '</span>';
+        }
         $link = l(
-          '<i class="icon ' . $servicess[$item['service']]['icon'] . '"></i>',
+          '<i class="icon ' . $servicess[$item['service']]['icon'] . '">' . $hidden_text . '</i>',
           $item['url'],
           array(
             'html' => TRUE,
