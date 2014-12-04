@@ -842,7 +842,7 @@ function socialfield_field_formatter_view($entity_type, $entity, $field, $instan
       foreach ($items as $item) {
         // Social link.
         $hidden_text = '';
-        if ($display['settings']['link_text']) {
+        if (isset($display['settings']['link_text']) && $display['settings']['link_text']) {
           // Wanting to set hidden text on link.
           $hidden_text = '<span class="element-invisible">' . check_plain($item['service']) . '</span>';
         }
