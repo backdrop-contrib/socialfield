@@ -284,12 +284,27 @@ function socialfield_field_info() {
       'description' => t('Social links'),
       'default_widget' => 'socialfield_widget',
       'default_formatter' => 'socialfield_formatter',
+      'property_type' => 'socialfield',
+      'property_callbacks' => array('socialfield_property_callback_property_info_callback'),
       'instance_settings' => array(
         'used_services' => $used_services,
         'services' => $displayed_services,
       ),
     ),
   );
+}
+
+/**
+ * Field property info callback.
+ */
+function socialfield_property_callback_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
+  $name = $field['field_name'];
+  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$name];
+
+  $property['type'] = 'socialfield';
+  $property['getter callback'] = 'entity_metadata_field_verbatim_get';
+  $property['setter callback'] = 'entity_metadata_field_verbatim_set';
+  unset($property['query callback']);
 }
 
 /**
