@@ -594,6 +594,7 @@ function socialfield_field_widget_form(&$form, &$form_state, $field, $instance, 
   // Settings to be accessed from ajax callback.
   $form_state['socialfield']['field_data'] = array(
     'field_name' => $field['field_name'],
+    'parents' => $element['#field_parents'],
     'langcode' => $langcode,
   );
 
@@ -721,8 +722,10 @@ function socialfield_field_widget_form(&$form, &$form_state, $field, $instance, 
 function socialfield_remove_one_element_callback($form, $form_state) {
   $field_name = $form_state['socialfield']['field_data']['field_name'];
   $langcode = $form_state['socialfield']['field_data']['langcode'];
+  $parents = $form_state['socialfield']['field_data']['parents'];
 
-  return $form[$field_name][$langcode]['social_buttons'];
+  $return_form = drupal_array_get_nested_value($form, $parents);
+  return $return_form[$field_name][$langcode]['social_buttons'];
 }
 
 /**
@@ -734,8 +737,10 @@ function socialfield_add_one_element_callback($form, $form_state) {
   }
   $field_name = $form_state['socialfield']['field_data']['field_name'];
   $langcode = $form_state['socialfield']['field_data']['langcode'];
+  $parents = $form_state['socialfield']['field_data']['parents'];
 
-  return $form[$field_name][$langcode]['social_buttons'];
+  $return_form = drupal_array_get_nested_value($form, $parents);
+  return $return_form[$field_name][$langcode]['social_buttons'];
 }
 
 /**
