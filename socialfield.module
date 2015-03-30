@@ -637,7 +637,7 @@ function theme_socialfield_drag_components($vars) {
     'attributes' => array(
       'id' => 'socialfield-table'
     ),
-  )) . drupal_render($element['add_one_social']);
+  )) . drupal_render($element['add_one_social']) . '<div class="description">' . drupal_render($element['description']) . '</div>';
 }
 
 /**
@@ -772,6 +772,11 @@ function socialfield_field_widget_form(&$form, &$form_state, $field, $instance, 
       'callback' => 'socialfield_add_one_element_callback',
       'wrapper' => 'social-field-wrapper',
     ),
+  );
+
+  // Add help description.
+  $element['social_buttons']['description'] = array(
+    '#markup' => $instance['description'],
   );
 
   // Attaching css and js files.
