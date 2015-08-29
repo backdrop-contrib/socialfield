@@ -1,5 +1,0 @@
-name = Font icons
-description = Loads fontello icons.
-core = 7.x
-
-dependencies[] = libraries

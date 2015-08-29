@@ -25,14 +25,6 @@ Installation
 - Add social fields to any entity.
 
 
-Sub-modules
------------------
-
-In addition to the core Social field module, you are able to enable the following sub-module:
-
-* Font icons (font_icons): Loads fontello icons. You must download fontello library to sites/all/libraries/fontello folder. You can download fontello from http://fontello.com.
-
-
 Permissions
 -----------
 
