@@ -1,7 +1,15 @@
 Socialfield
 ============
 
-The Socialfield module provides a field that allows you to collect links to social network profiles like facebook, twitter, googleplus, linkedin, etc.
+The Social field module provides a single field that allows you to collect links
+to multiple social networks like facebook, twitter, googleplus, linkedin, etc.
+
+The links are presented as anchor tags with specific classes. These classes can
+can be customized for each service. The classes can be used in conjunction with 
+icon fonts (such as fontello or font awesome) to display the links as icons.
+
+Links entered into social fields will be validated to assure they match the
+service. Validation criteria can also be customized for each service.
 
 
 Installation
@@ -11,8 +19,8 @@ Installation
   https://backdropcms.org/guide/modules
 
 - Visit the configuration page under Administration > Configuration > Media >
-  Socialfield (admin/config/category/foo) for adding, editing and deleting
-  which social services are available.
+  Socialfield (admin/config/category/foo) to configure available social
+  services.
 
 - Add social fields to any entity.
 

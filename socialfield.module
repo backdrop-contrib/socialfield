@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Provides a field for adding social services links.
@@ -18,20 +17,20 @@ function socialfield_menu() {
   );
   $items['admin/config/media/socialfield/add'] = array(
     'title' => 'Add new service',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('socialfield_add_service'),
     'access arguments' => array('create new service'),
     'type' => MENU_LOCAL_ACTION,
   );
   $items['admin/config/media/socialfield/%/edit'] = array(
     'title' => 'Edit service',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('socialfield_edit_service', 4),
     'access arguments' => array('edit any service'),
   );
   $items['admin/config/media/socialfield/%/delete'] = array(
     'title' => 'Delete service',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('socialfield_delete_service', 4),
     'access arguments' => array('delete any service'),
   );
@@ -72,7 +71,7 @@ function socialfield_settings() {
   );
 
   $rows = array();
-  $services = variable_get('socialfield_services');
+  $services = config_get('socialfield.settings', 'services');
   foreach ($services as $name => $service) {
     $edit = l(
       t('edit'),
@@ -107,23 +106,27 @@ function socialfield_settings() {
  * Form for adding a new service.
  */
 function socialfield_add_service($form, $form_state) {
-  $form['service'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Service machine name'),
-  );
   $form['service_name'] = array(
     '#type' => 'textfield',
-    '#title' => t('Service name'),
+    '#title' => t('Service'),
+  );
+  $form['service'] = array(
+    '#type' => 'machine_name',
+    '#title' => t('Service machine name'),
+    '#disabled' => TRUE,
+    '#machine_name' => array(
+      'source' => array('service_name'),
+    ),
   );
   $form['service_icon'] = array(
     '#type' => 'textfield',
-    '#description' => t('Example: icon-facebook'),
-    '#title' => t('Service icon class'),
+    '#title' => t('CSS classes'),
+    '#description' => t('Separate multiple classes with spaces: <em>icon-facebook fa fa-facebook-square</em>'),
   );
   $form['service_validation_pattern'] = array(
     '#type' => 'textarea',
-    '#description' => t('Enter the list of allowed urls separated by new line.<br />Leave empty to allow user input any urls.<br />The "*" character is a wildcard.<br />Example: *facebook.com/* for any page on Facebook site.'),
-    '#title' => t('Url validation pattern'),
+    '#title' => t('URL validation pattern'),
+    '#description' => t('Enter the list of allowed URL patterns separated by new lines.<br />Leave empty to allow user input any URLs.<br />The "*" character is a wildcard.<br />Example: *facebook.com/* for any page on Facebook site.'),
   );
   $form['submit'] = array(
     '#type' => 'submit',
@@ -137,7 +140,7 @@ function socialfield_add_service($form, $form_state) {
  * Validates form when adding a new service.
  */
 function socialfield_add_service_validate($form, &$form_state) {
-  $services = variable_get('socialfield_services');
+  $services = config_get('socialfield.settings', 'services');
   if (isset($services[$form_state['values']['service']])) {
     form_set_error('service', t('This service already exist.'));
   }
@@ -148,7 +151,7 @@ function socialfield_add_service_validate($form, &$form_state) {
  */
 function socialfield_add_service_submit($form, $form_state) {
   $values = &$form_state['values'];
-  $services = variable_get('socialfield_services');
+  $services = config_get('socialfield.settings', 'services');
 
   $service = array(
     'name' => $values['service_name'],
@@ -158,8 +161,8 @@ function socialfield_add_service_submit($form, $form_state) {
 
   $services[$values['service']] = $service;
 
-  variable_set('socialfield_services', $services);
-  drupal_goto('admin/config/media/socialfield');
+  config_set('socialfield.settings', 'services', $services);
+  backdrop_goto('admin/config/media/socialfield');
 }
 
 /**
@@ -167,38 +170,42 @@ function socialfield_add_service_submit($form, $form_state) {
  */
 function socialfield_edit_service($form, $form_state, $service = NULL) {
   if (!isset($service)) {
-    drupal_set_message(t('No service specified.'), 'error');
-    drupal_goto('admin/config/media/socialfield');
+    backdrop_set_message(t('No service specified.'), 'error');
+    backdrop_goto('admin/config/media/socialfield');
   }
 
-  $services = variable_get('socialfield_services');
+  $services = config_get('socialfield.settings', 'services');
 
   if (!isset($services[$service])) {
-    drupal_set_message(t('The specified service does not exist.'), 'error');
-    drupal_goto('admin/config/media/socialfield');
+    backdrop_set_message(t('The specified service does not exist.'), 'error');
+    backdrop_goto('admin/config/media/socialfield');
   }
 
-  $form['service'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Service machine name'),
-    '#value' => $service,
-    '#disabled' => TRUE,
-  );
   $form['service_name'] = array(
     '#type' => 'textfield',
-    '#title' => t('Service name'),
+    '#title' => t('Service'),
     '#default_value' => $services[$service]['name'],
   );
+  $form['service'] = array(
+    '#type' => 'machine_name',
+    '#title' => t('Service machine name'),
+    '#default_value' => $service,
+    '#disabled' => TRUE,
+    '#machine_name' => array(
+      'source' => array('service_name'),
+    ),
+  );
+
   $form['service_icon'] = array(
     '#type' => 'textfield',
-    '#description' => t('Example: icon-facebook'),
-    '#title' => t('Service fonticon class'),
+    '#title' => t('CSS classes'),
+    '#description' => t('Separate multiple classes with spaces: <em>icon-facebook fa fa-facebook-square</em>'),
     '#default_value' => $services[$service]['icon'],
   );
   $form['service_validation_pattern'] = array(
     '#type' => 'textarea',
-    '#description' => t('Enter the list of allowed urls separated by new line.<br />Leave empty to allow user input any urls.<br />The "*" character is a wildcard.<br />Example: *facebook.com/* for any page on Facebook site.'),
-    '#title' => t('Url validation pattern'),
+    '#title' => t('URL validation pattern'),
+    '#description' => t('Enter the list of allowed URL patterns separated by new lines.<br />Leave empty to allow user input any URLs.<br />The "*" character is a wildcard.<br />Example: *facebook.com/* for any page on Facebook site.'),
     '#default_value' => $services[$service]['validation_pattern'],
   );
   $form['submit'] = array(
@@ -214,7 +221,7 @@ function socialfield_edit_service($form, $form_state, $service = NULL) {
  */
 function socialfield_edit_service_submit($form, $form_state) {
   $values = &$form_state['values'];
-  $services = variable_get('socialfield_services');
+  $services = config_get('socialfield.settings', 'services');
 
   $service = array(
     'name' => $values['service_name'],
@@ -224,8 +231,8 @@ function socialfield_edit_service_submit($form, $form_state) {
 
   $services[$values['service']] = $service;
 
-  variable_set('socialfield_services', $services);
-  drupal_goto('admin/config/media/socialfield');
+  config_set('socialfield.settings', 'services', $services);
+  backdrop_goto('admin/config/media/socialfield');
 }
 
 /**
@@ -233,15 +240,15 @@ function socialfield_edit_service_submit($form, $form_state) {
  */
 function socialfield_delete_service($form, $form_state, $service = NULL) {
   if (!isset($service)) {
-    drupal_set_message(t('No service specified.'), 'error');
-    drupal_goto('admin/config/media/socialfield');
+    backdrop_set_message(t('No service specified.'), 'error');
+    backdrop_goto('admin/config/media/socialfield');
   }
 
-  $services = variable_get('socialfield_services');
+  $services = config_get('socialfield.settings', 'services');
 
   if (!isset($services[$service])) {
-    drupal_set_message(t('The specified service does not exist.'), 'error');
-    drupal_goto('admin/config/media/socialfield');
+    backdrop_set_message(t('The specified service does not exist.'), 'error');
+    backdrop_goto('admin/config/media/socialfield');
   }
 
   $form['service'] = array(
@@ -259,23 +266,23 @@ function socialfield_delete_service($form, $form_state, $service = NULL) {
  */
 function socialfield_delete_service_submit($form, $form_state) {
   $values = &$form_state['values'];
-  $services = variable_get('socialfield_services');
+  $services = config_get('socialfield.settings', 'services');
 
   unset($services[$values['service']]);
 
-  variable_set('socialfield_services', $services);
-  drupal_set_message(t('@service service was successfully deleted.', array('@service' => $values['service'])));
-  drupal_goto('admin/config/media/socialfield');
+  config_set('socialfield.settings', 'services', $services);
+  backdrop_set_message(t('@service service was successfully deleted.', array('@service' => $values['service'])));
+  backdrop_goto('admin/config/media/socialfield');
 }
 
 /**
  * Implements hook_field_info().
  */
 function socialfield_field_info() {
-  $used_services = array_keys(variable_get('socialfield_services'));
+  $used_services = array_keys(config_get('socialfield.settings', 'services'));
   $used_services = array_combine($used_services, $used_services);
 
-  $displayed_services = array('twitter', 'googleplus', 'facebook');
+  $displayed_services = array('twitter', 'facebook', 'googleplus');
   $displayed_services = array_combine($displayed_services, $displayed_services);
 
   $weight_values = range(-10, count($used_services) - 11);
@@ -315,7 +322,7 @@ function socialfield_property_callback_property_info_callback(&$info, $entity_ty
  * Implements hook_field_instance_settings_form().
  */
 function socialfield_field_instance_settings_form($field, $instance) {
-  $social_services = variable_get('socialfield_services');
+  $social_services = config_get('socialfield.settings', 'services');
   $options = array();
   foreach ($social_services as $name => $service) {
     $options[$name] = $service['name'];
@@ -346,7 +353,7 @@ function _socialfield_field_instance_settings_form($form, &$form_state) {
   $form_state['#weights'] = $form['#instance']['settings']['weights'];
 
   asort($form_state['#weights']);
-  $services = variable_get('socialfield_services');
+  $services = config_get('socialfield.settings', 'services');
 
   $rows = array();
   foreach ($form_state['#weights'] as $service_name => $weight) {
@@ -399,7 +406,7 @@ function _socialfield_field_instance_settings_form($form, &$form_state) {
     $rows[] = $row;
   }
 
-  $module_path = drupal_get_path('module', 'socialfield');
+  $module_path = backdrop_get_path('module', 'socialfield');
 
   // Theme this part of the form as a table.
   $form['table'] = array(
@@ -483,7 +490,7 @@ function theme_socialfield_form_table(&$variables) {
       if (isset($element['#type']) && $element['#type'] == 'hidden') {
         continue;
       }
-      $row[] = drupal_render($data[$row_index][$col_index]);
+      $row[] = backdrop_render($data[$row_index][$col_index]);
     }
 
     $rows[] = array(
@@ -498,7 +505,7 @@ function theme_socialfield_form_table(&$variables) {
     'attributes' => $attributes
   ));
 
-  drupal_add_tabledrag($attributes['id'], 'order', 'sibling', 'services-order-weight');
+  backdrop_add_tabledrag($attributes['id'], 'order', 'sibling', 'services-order-weight');
 
   return $output;
 }
@@ -519,7 +526,7 @@ function socialfield_field_validate($entity_type, $entity, $field, $instance, $l
     return;
   }
 
-  $services = variable_get('socialfield_services');
+  $services = config_get('socialfield.settings', 'services');
   $form_elements = array($field['field_name'], $langcode, 'social_buttons');
   foreach ($items as $delta => &$item) {
     if (!$item['url']) {
@@ -534,7 +541,7 @@ function socialfield_field_validate($entity_type, $entity, $field, $instance, $l
     }
     else {
       // Checking if the url matches the pattern.
-      $match = drupal_match_path($item['url'], $services[$item['service']]['validation_pattern']);
+      $match = backdrop_match_path($item['url'], $services[$item['service']]['validation_pattern']);
       if (!$match) {
         $form_element = array_merge($form_elements, array('element_' . $delta, 'url'));
         form_set_error(
@@ -595,11 +602,10 @@ function socialfield_theme($existing, $type, $theme, $path) {
  */
 function theme_socialfield_drag_components($vars) {
   $element = $vars['element'];
-  drupal_add_tabledrag('socialfield-table', 'order', 'sibling', 'item-row-weight');
+  backdrop_add_tabledrag('socialfield-table', 'order', 'sibling', 'item-row-weight');
+  $services = config_get('socialfield.settings', 'services');
 
-  $services = variable_get('socialfield_services');
-
-  $header = array(t('Social links'), '', '', '');
+  $header = array(t($element['#title']), '', '', '');
   $rows = array();
   $index = 0;
 
@@ -610,16 +616,17 @@ function theme_socialfield_drag_components($vars) {
     }
     $current_element = $element['element_' . $index];
 
+
     $rows[] = array(
       'data' => array(
         '<div class="social-links">' .
           '<span class="service-' . $current_element['#service'] . '">' .
-            '<i class="icon ' . $services[$current_element['#service']]['icon'] . '"></i>' .
+            '<i class="icon ' . $services[$current_element['#service']]['icon'] . '">' . t($services[$current_element['#service']]['name']) . '</i>' .
           '</span>' .
         '</div>',
-        drupal_render($current_element['url']),
-        drupal_render($current_element['weight']),
-        drupal_render($current_element['operation']),
+        backdrop_render($current_element['url']),
+        backdrop_render($current_element['weight']),
+        backdrop_render($current_element['operation']),
       ),
       'class' => array('draggable'),
       'weight' => $current_element['weight']['#value'],
@@ -629,7 +636,7 @@ function theme_socialfield_drag_components($vars) {
   }
 
   // Sorting elements by their weight.
-  uasort($rows, 'drupal_sort_weight');
+  backdrop_sort($rows, array('weight'));
 
   return theme('table', array(
     'header' => $header,
@@ -637,7 +644,7 @@ function theme_socialfield_drag_components($vars) {
     'attributes' => array(
       'id' => 'socialfield-table'
     ),
-  )) . drupal_render($element['add_one_social']) . '<div class="description">' . drupal_render($element['description']) . '</div>';
+  )) . backdrop_render($element['add_one_social']) . '<div class="description">' . backdrop_render($element['description']) . '</div>';
 }
 
 /**
@@ -646,7 +653,7 @@ function theme_socialfield_drag_components($vars) {
 function socialfield_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   $value_key = key($field['columns']);
 
-  $all_services = variable_get('socialfield_services');
+  $all_services = config_get('socialfield.settings', 'services');
 
   // Settings to be accessed from ajax callback.
   $form_state['socialfield']['field_data'] = array(
@@ -691,6 +698,7 @@ function socialfield_field_widget_form(&$form, &$form_state, $field, $instance, 
 
   // Creating wrapper and setting theme (table) on it.
   $element['social_buttons'] = array(
+    '#title' => $instance['label'],
     '#prefix' => '<div id="social-field-wrapper">',
     '#suffix' => '</div>',
     '#tree' => TRUE,
@@ -780,7 +788,7 @@ function socialfield_field_widget_form(&$form, &$form_state, $field, $instance, 
   );
 
   // Attaching css and js files.
-  $path = drupal_get_path('module', 'socialfield');
+  $path = backdrop_get_path('module', 'socialfield');
   $element['#attached']['js'][] = $path . '/js/socialfield.js';
   $element['#attached']['css'][] = $path . '/css/socialfield.css';
 
@@ -795,7 +803,7 @@ function socialfield_remove_one_element_callback($form, $form_state) {
   $langcode = $form_state['socialfield']['field_data']['langcode'];
   $parents = $form_state['socialfield']['field_data']['parents'];
 
-  $return_form = drupal_array_get_nested_value($form, $parents);
+  $return_form = backdrop_array_get_nested_value($form, $parents);
   return $return_form[$field_name][$langcode]['social_buttons'];
 }
 
@@ -810,7 +818,7 @@ function socialfield_add_one_element_callback($form, $form_state) {
   $langcode = $form_state['socialfield']['field_data']['langcode'];
   $parents = $form_state['socialfield']['field_data']['parents'];
 
-  $return_form = drupal_array_get_nested_value($form, $parents);
+  $return_form = backdrop_array_get_nested_value($form, $parents);
   return $return_form[$field_name][$langcode]['social_buttons'];
 }
 
@@ -883,8 +891,8 @@ function socialfield_field_formatter_settings_form($field, $instance, $view_mode
   $element = array();
   $element['link_text'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Hidden text on link'),
-    '#description' => t('Each icon link will contain his service name as a hidden text. This if useful for screen readers.'),
+    '#title' => t('Hidden text in link'),
+    '#description' => t('Include the service name as hidden text (useful for screen readers).'),
     '#default_value'  => $settings['link_text'],
   );
 
@@ -913,8 +921,9 @@ function socialfield_field_formatter_view($entity_type, $entity, $field, $instan
 
   switch ($display['type']) {
     case 'socialfield_formatter':
-      uasort($items, 'drupal_sort_weight');
-      $services = variable_get('socialfield_services');
+      backdrop_sort($items, array('weight'));
+      $services = config_get('socialfield.settings', 'services');
+
       foreach ($items as $item) {
         // Checking if the service was deleted.
         if (!isset($services[$item['service']])) {
@@ -963,7 +972,7 @@ function socialfield_field_formatter_view($entity_type, $entity, $field, $instan
         '#label' => $label,
       );
 
-      $element['#attached']['css'][] = drupal_get_path('module', 'socialfield') . '/css/socialfield.css';
+      $element['#attached']['css'][] = backdrop_get_path('module', 'socialfield') . '/css/socialfield.css';
       break;
   }
 
@@ -996,7 +1005,7 @@ function theme_socialfield_formatter($variables) {
     }
   }
 
-  $label = drupal_render($label);
+  $label = backdrop_render($label);
 
   $list = theme('item_list', array(
     'items' => $variables['items'],
