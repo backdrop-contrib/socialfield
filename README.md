@@ -15,20 +15,14 @@ service. Validation criteria can also be customized for each service.
 Installation
 ------------
 
-- Install this module using the official Backdrop CMS instructions at
+1) Install this module using the official Backdrop CMS instructions at
   https://backdropcms.org/guide/modules
 
-- Visit the configuration page under Administration > Configuration > Media >
+1) Visit the configuration page under Administration > Configuration > Media >
   Socialfield (admin/config/category/foo) to configure available social
   services.
 
-- Add social fields to any entity.
-
-
-Permissions
------------
-
-The core Social field module defines permissions for viewing, creating, editing and deleting social services. All of these permissions can be found at admin/config/people/permissions.
+1) Add social fields to any entity (nodes, users, terms, etc).
 
 
 License
@@ -42,7 +36,7 @@ Current Maintainers
 -------------------
 
 - Jen Lampton (https://github.com/jenlampton)
-- Seeking additional comaintainers
+- Seeking additional maintainers
 
 
 Credits

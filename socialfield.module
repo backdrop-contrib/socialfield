@@ -12,27 +12,27 @@ function socialfield_menu() {
     'title' => 'Social field',
     'description' => 'Social field settings',
     'page callback' => 'socialfield_settings',
-    'access arguments' => array('view services'),
+    'access arguments' => array('administer socialfield'),
     'type' => MENU_NORMAL_ITEM,
   );
   $items['admin/config/media/socialfield/add'] = array(
     'title' => 'Add new service',
     'page callback' => 'backdrop_get_form',
     'page arguments' => array('socialfield_add_service'),
-    'access arguments' => array('create new service'),
+    'access arguments' => array('administer socialfield'),
     'type' => MENU_LOCAL_ACTION,
   );
   $items['admin/config/media/socialfield/%/edit'] = array(
     'title' => 'Edit service',
     'page callback' => 'backdrop_get_form',
     'page arguments' => array('socialfield_edit_service', 4),
-    'access arguments' => array('edit any service'),
+    'access arguments' => array('administer socialfield'),
   );
   $items['admin/config/media/socialfield/%/delete'] = array(
     'title' => 'Delete service',
     'page callback' => 'backdrop_get_form',
     'page arguments' => array('socialfield_delete_service', 4),
-    'access arguments' => array('delete any service'),
+    'access arguments' => array('administer socialfield'),
   );
 
   return $items;
@@ -43,17 +43,8 @@ function socialfield_menu() {
  */
 function socialfield_permission() {
   return array(
-    'view services' => array(
-      'title' => t('View services'),
-    ),
-    'create new service' => array(
-      'title' => t('Create new service'),
-    ),
-    'edit any service' => array(
-      'title' => t('Edit any service'),
-    ),
-    'delete any service' => array(
-      'title' => t('Delete any service'),
+    'administer socialfield' => array(
+      'title' => t('Administer Socialfield services'),
     ),
   );
 }
