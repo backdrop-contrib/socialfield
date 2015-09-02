@@ -62,16 +62,7 @@ function socialfield_theme($existing, $type, $theme, $path) {
       'render element' => 'element',
       'file' => 'socialfield.theme.inc',
     ),
-    'socialfield_formatter' => array(
-      'variables' => array(
-        'items' => NULL,
-        'field' => NULL,
-        'label' => NULL,
-      ),
-      'file' => 'socialfield.theme.inc',
-    ),
     'socialfield_form_table' => array(
-      // The renderable element is the form.
       'render element' => 'form',
       'file' => 'socialfield.theme.inc',
     ),
@@ -605,67 +596,45 @@ function socialfield_field_formatter_settings_summary($field, $instance, $view_m
  * Implements hook_field_formatter_view().
  */
 function socialfield_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
-  if (!$items) {
-    return;
-  }
-
-  $list_items = array();
+  $element = array();
 
   switch ($display['type']) {
     case 'socialfield_formatter':
-      backdrop_sort($items, array('weight'));
       $services = config_get('socialfield.settings', 'services');
-
-      foreach ($items as $item) {
-        // Checking if the service was deleted.
+      backdrop_add_css(backdrop_get_path('module', 'socialfield') . '/css/socialfield.css');
+      backdrop_sort($items, array('weight'));
+      foreach ($items as $key => $item) {
+        // Check if the service was deleted.
         if (!isset($services[$item['service']])) {
           continue;
         }
 
-        // Social link.
         $hidden_text = '';
+        // Set hidden text on link.
         if (isset($display['settings']['link_text']) && $display['settings']['link_text']) {
-          // Wanting to set hidden text on link.
           $hidden_text = '<span class="element-invisible">' . check_plain($item['service']) . '</span>';
         }
-        $link = l(
-          '<i class="icon ' . $services[$item['service']]['icon'] . '">' . $hidden_text . '</i>',
-          $item['url'],
-          array(
-            'html' => TRUE,
-            'attributes' => array(
-              'target' => '_blank',
-            )
-          )
-        );
 
-        $list_items[] = array(
-          'data'  => $link,
-          'class' => array('field-item', 'service-' . $item['service']),
+        $element[$key] = array(
+          '#type'  => 'link',
+          '#href' => $item['url'],
+          '#title' => '<i class="icon ' . $services[$item['service']]['icon'] . '">' . $hidden_text . '</i>',
+          '#options' => array('html' => TRUE),
+          '#attributes' => array(
+            'class' => array('field-item', 'socialfield', 'socialfield-' . $item['service']),
+            'target' => '_blank',
+          ),
         );
       }
 
-      // Checking if there are links to display.
-      if (!$list_items) {
-        return;
-      }
+    break;
+  }
 
-      // Label.
-      $label = array(
-        'label' => $instance['label'],
-        'mode' => $display['label'],
-      );
-
-      // Make list from items.
-      $element = array(
-        '#theme' => 'socialfield_formatter',
-        '#items' => $list_items,
-        '#field' => $field,
-        '#label' => $label,
-      );
-
-      $element['#attached']['css'][] = backdrop_get_path('module', 'socialfield') . '/css/socialfield.css';
-      break;
+  if (!empty($element)) {
+    $element['#label'] = array(
+      'label' => $instance['label'],
+      'mode' => $display['label'],
+    );
   }
 
   return $element;

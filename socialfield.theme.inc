@@ -7,8 +7,8 @@
 /**
  * Custom theme output for widget.
  */
-function theme_socialfield_drag_components($vars) {
-  $element = $vars['element'];
+function theme_socialfield_drag_components($variables) {
+  $element = $variables['element'];
   backdrop_add_tabledrag('socialfield-table', 'order', 'sibling', 'item-row-weight');
   $services = config_get('socialfield.settings', 'services');
 
@@ -23,11 +23,10 @@ function theme_socialfield_drag_components($vars) {
     }
     $current_element = $element['element_' . $index];
 
-
     $rows[] = array(
       'data' => array(
         '<div class="social-links">' .
-          '<span class="service-' . $current_element['#service'] . '">' .
+          '<span class="socialfield socialfield-' . $current_element['#service'] . '">' .
             '<i class="icon ' . $services[$current_element['#service']]['icon'] . '">' . t($services[$current_element['#service']]['name']) . '</i>' .
           '</span>' .
         '</div>',
@@ -52,50 +51,6 @@ function theme_socialfield_drag_components($vars) {
       'id' => 'socialfield-table'
     ),
   )) . backdrop_render($element['add_one_social']) . '<div class="description">' . backdrop_render($element['description']) . '</div>';
-}
-
-/**
- * Custom theme output for the formatter.
- */
-function theme_socialfield_formatter($variables) {
-  $label = array();
-  $label_class = '';
-  if (isset($variables['label']['mode']) && $variables['label']['mode'] != 'hidden') {
-    $label = array(
-      '#markup' => $variables['label']['label'],
-      '#prefix' => '<div class="field-label">',
-      '#suffix' => '</div>',
-    );
-
-    switch ($variables['label']['mode']) {
-      case 'above':
-        $label_class = 'field-label-above';
-        break;
-      case 'inline':
-        $label_class = 'field-label-inline';
-        break;
-      case 'hidden':
-        $label_class = 'field-label-hidden';
-        break;
-    }
-  }
-
-  $label = backdrop_render($label);
-
-  $list = theme('item_list', array(
-    'items' => $variables['items'],
-    'attributes' => array('class' => array('field-items')),
-  ));
-
-  $field_classes = array(
-    'field',
-    'field-name-' . str_replace('_', '-', $variables['field']['field_name']),
-    'field-type-' . str_replace('_', '-', $variables['field']['type']),
-    $label_class,
-    'social-links',
-  );
-
-  return '<div class="' . implode(' ', $field_classes) . '">' . $label . $list . '</div>';
 }
 
 /**
