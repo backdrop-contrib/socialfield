@@ -19,7 +19,7 @@ Installation
   https://backdropcms.org/guide/modules
 
 1) Visit the configuration page under Administration > Configuration > Media >
-  Socialfield (admin/config/category/foo) to configure available social
+  Socialfield (admin/config/media/socialfield) to configure available social
   services.
 
 1) Add social fields to any entity (nodes, users, terms, etc).
@@ -42,6 +42,9 @@ Current Maintainers
 Credits
 -------
 
-This module was originally written for Drupal by Mihai Husar
-(https://www.drupal.org/u/mihai-husar) and was adapted for Backdrop CMS by Jen
-Lampton (https://github.com/jenlampton)
+- Originally written for Drupal by Mihai Husar
+(https://www.drupal.org/u/mihai-husar)
+
+- Ported to Backdrop CMS by Jen Lampton (https://github.com/jenlampton)
+
+- Port to Backdrop sponsored by [America's Best Bootfiters](http://www.bootfitters.com), and [Masterfit Enterprises Inc.](http://masterfitinc.com)
