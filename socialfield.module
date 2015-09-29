@@ -354,7 +354,8 @@ function socialfield_field_widget_form(&$form, &$form_state, $field, $instance, 
 
   // Remove button was pressed.
   if (isset($form_state['clicked_button']['#name']) && isset($form_state['clicked_button']['#socialfield_delete'])) {
-    $remove_element = (int)end(explode('_', $form_state['clicked_button']['#name']));
+    $button = explode('_', $form_state['clicked_button']['#name']);
+    $remove_element = (int)end($button);
     unset($form_state['values'][$field['field_name']][$langcode][$remove_element]);
     unset($form_state['services'][$remove_element]);
   }
