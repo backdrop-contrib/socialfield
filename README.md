@@ -5,7 +5,7 @@ The Social field module provides a single field that allows you to collect links
 to multiple social networks like facebook, twitter, googleplus, linkedin, etc.
 
 The links are presented as anchor tags with specific classes. These classes can
-can be customized for each service. The classes can be used in conjunction with 
+can be customized for each service. The classes can be used in conjunction with
 icon fonts (such as fontello or font awesome) to display the links as icons.
 
 Links entered into social fields will be validated to assure they match the
@@ -36,6 +36,7 @@ Current Maintainers
 -------------------
 
 - Jen Lampton (https://github.com/jenlampton)
+- Daniel Rose (https://github.com/danielrose28)
 - Seeking additional maintainers
 
 
