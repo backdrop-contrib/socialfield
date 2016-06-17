@@ -611,7 +611,7 @@ function socialfield_field_formatter_settings_form($field, $instance, $view_mode
     '#type' => 'checkbox',
     '#title' => t('Add rel="nofollow"'),
     '#description' => t('Each icon link will have "rel" attribute set to "nofollow". This will disallow search engines to follow the link.'),
-    '#default_value'  => $settings['link_rel_nofollow'],
+    '#default_value' => $settings['link_rel_nofollow'],
   );
 
   return $element;
