@@ -582,6 +582,7 @@ function socialfield_field_formatter_info() {
       'field types' => array('social_links_field'),
       'settings' => array(
         'link_text' => FALSE,
+        'link_rel_nofollow' => FALSE,
       ),
     ),
   );
@@ -604,6 +605,13 @@ function socialfield_field_formatter_settings_form($field, $instance, $view_mode
     '#title' => t('Hidden text in link'),
     '#description' => t('Include the service name as hidden text (useful for screen readers).'),
     '#default_value'  => $settings['link_text'],
+  );
+
+  $element['link_rel_nofollow'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Add rel="nofollow"'),
+    '#description' => t('Each icon link will have "rel" attribute set to "nofollow". This will disallow search engines to follow the link.'),
+    '#default_value' => $settings['link_rel_nofollow'],
   );
 
   return $element;
@@ -652,6 +660,11 @@ function socialfield_field_formatter_view($entity_type, $entity, $field, $instan
             'target' => '_blank',
           ),
         );
+
+        // Add rel="nofollow" to the link if it's set through formatter settings.
+        if (isset($display['settings']['link_rel_nofollow']) && $display['settings']['link_rel_nofollow']) {
+          $element[$key]['#attributes']['rel'] = 'nofollow';
+        }
       }
 
     break;
