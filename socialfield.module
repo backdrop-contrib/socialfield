@@ -643,13 +643,15 @@ function socialfield_field_formatter_view($entity_type, $entity, $field, $instan
         }
 
         $element[$key] = array(
-          '#type'  => 'link',
-          '#href' => $item['url'],
-          '#title' => '<i class="icon ' . $services[$item['service']]['icon'] . '">' . $hidden_text . '</i>',
-          '#options' => array('html' => TRUE),
-          '#attributes' => array(
-            'class' => array('field-item', 'socialfield', 'socialfield-' . $item['service']),
-            'target' => '_blank',
+          '#theme' => array('link__socialfield__' . $item['service'], 'link__socialfield', 'link'),
+          '#path' => $item['url'],
+          '#text' => '<i class="icon ' . $services[$item['service']]['icon'] . '">' . $hidden_text . '</i>',
+          '#options' => array(
+            'html' => TRUE,
+            'attributes' => array(
+              'class' => array('field-item', 'socialfield', 'socialfield-' . $item['service']),
+              'target' => '_blank',
+            ),
           ),
         );
       }
