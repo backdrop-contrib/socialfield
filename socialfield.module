@@ -98,7 +98,8 @@ function socialfield_service_exists($name){
  * Implements hook_field_info().
  */
 function socialfield_field_info() {
-  $used_services = array_keys(config_get('socialfield.settings', 'services'));
+  $services = config_get('socialfield.settings', 'services');
+  $used_services = is_array($services) ? array_keys($services) : array('facebook');
   $used_services = array_combine($used_services, $used_services);
 
   $displayed_services = array('twitter', 'facebook', 'googleplus');
