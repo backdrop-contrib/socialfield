@@ -99,7 +99,7 @@ function socialfield_service_exists($name){
  */
 function socialfield_field_info() {
   $services = config_get('socialfield.settings', 'services');
-  $used_services = is_array($services) ? array_keys($services) : array();
+  $used_services = is_array($services) ? array_keys($services) : array('facebook');
   $used_services = array_combine($used_services, $used_services);
 
   $displayed_services = array('twitter', 'facebook', 'googleplus');
