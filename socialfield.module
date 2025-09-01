@@ -81,6 +81,17 @@ function socialfield_permission() {
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function socialfield_form_field_ui_field_edit_form_alter(&$form, &$form_state) {
+  if ($form['#field']['type'] == 'social_links_field') {
+    // Hide the cardinality setting on field instance settings for social_links_field fields.
+    $form['field']['cardinality_container']['cardinality']['#default_value'] = FIELD_CARDINALITY_UNLIMITED;
+    $form['field']['cardinality_container']['cardinality']['#disabled'] = TRUE;
+  }
+}
+
+/**
  * Implements hook_theme().
  */
 function socialfield_theme($existing, $type, $theme, $path) {
@@ -760,6 +771,10 @@ function socialfield_field_formatter_view($entity_type, $entity, $field, $instan
   return $element;
 }
 
+/*******************************************************************************
+ * Helper functions
+ ******************************************************************************/
+
 /**
  * Helper function, renders an icon as an <i> tag with classes.
  *
@@ -810,15 +825,4 @@ function _socialfield_formatter_format($item, $service_info, $options) {
   $hidden_text = '<span class="element-invisible">' . $options['hidden_text'] . '</span>';
 
   return '<i class="' . implode(' ', $icon_classes) . '">' . $hidden_text . '</i>';
-}
-
-/**
- * Implements hook_form_FORM_ID_alter().
- */
-function socialfield_form_field_ui_field_edit_form_alter(&$form, &$form_state) {
-  if ($form['#field']['type'] == 'social_links_field') {
-    // Hide the cardinality setting on field instance settings for social_links_field fields.
-    $form['field']['cardinality_container']['cardinality']['#default_value'] = FIELD_CARDINALITY_UNLIMITED;
-    $form['field']['cardinality_container']['cardinality']['#disabled'] = TRUE;
-  }
 }

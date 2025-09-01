@@ -80,8 +80,14 @@ function socialfield_update_1001() {
   $config->save();
 }
 
+/*******************************************************************************
+ * Helper functions
+ ******************************************************************************/
+
 /**
- * Update socialfield settings.
+ * Helper function: return a list of all default services.
+ *
+ * @see _socialfield_service_keys() for current keys.
  */
 function socialfield_default_services() {
   $services = array(

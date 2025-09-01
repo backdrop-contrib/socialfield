@@ -76,21 +76,6 @@ function theme_socialfield_drag_components($variables) {
 }
 
 /**
- * Helper function, generates an 8 character random string.
- *
- * @see BackdropTestCase::randomName()
- */
-function socialfield_random_string($length = 8) {
-  $values = array_merge(range(65, 90), range(97, 122), range(48, 57));
-  $max = count($values) - 1;
-  $str = chr(mt_rand(97, 122));
-  for ($i = 1; $i < $length; $i++) {
-    $str .= chr($values[mt_rand(0, $max)]);
-  }
-  return $str;
-}
-
-/**
  * Theme callback for the form table.
  */
 function theme_socialfield_form_table(&$variables) {
@@ -127,4 +112,23 @@ function theme_socialfield_form_table(&$variables) {
   backdrop_add_tabledrag($attributes['id'], 'order', 'sibling', 'services-order-weight');
 
   return $output;
+}
+
+/*******************************************************************************
+ * Helper functions
+ ******************************************************************************/
+
+/**
+ * Helper function, generates an 8 character random string.
+ *
+ * @see BackdropTestCase::randomName()
+ */
+function socialfield_random_string($length = 8) {
+  $values = array_merge(range(65, 90), range(97, 122), range(48, 57));
+  $max = count($values) - 1;
+  $str = chr(mt_rand(97, 122));
+  for ($i = 1; $i < $length; $i++) {
+    $str .= chr($values[mt_rand(0, $max)]);
+  }
+  return $str;
 }

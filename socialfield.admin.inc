@@ -16,36 +16,6 @@ function socialfield_settings($form, &$form_state) {
       'css' => array(backdrop_get_path('module', 'socialfield') . '/css/socialfield.css'),
     ),
   );
-  $form['settings'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Socialfield Settings'),
-    '#collapsible' => TRUE,
-  );
-  $form['settings']['filled'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Use filled versions of icons'),
-    '#description' => t('Change this setting to review the icons below.'),
-    '#default_value' => $config->get('filled'),
-  );
-
-  $form['settings']['dont'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Not Recommended'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-  );
-  $form['settings']['dont']['new_windows'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Open links in new windows'),
-    '#description' => t('Forcing links to open in new windows makes it difficult for people to find their way back to this site, and is generally bad for accessibility. <br>Enabling this setting could hinder SEO.'),
-    '#default_value'  => $config->get('new_windows'),
-  );
-  $form['settings']['dont']['remove_hidden_text'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Remove hidden labels from social links  (not recommended)'),
-    '#description' => t('Including the service name as hidden text is helpful for screen readers. <br>Enabling this setting could hinder SEO.'),
-    '#default_value'  => $config->get('remove_hidden_text'),
-  );
 
   $header = array(
     t('Service'),
@@ -62,19 +32,23 @@ function socialfield_settings($form, &$form_state) {
     // Move the disabled services to the end.
     $disabled_services = array();
     foreach ($services as $name => $service_info) {
-      if (!isset($service_info['enabled']) || $service_info['enabled'] == FALSE) {
+      if (isset($service_info['enabled']) && $service_info['enabled'] == FALSE) {
         $disabled_services[$name] = $service_info;
         unset($services[$name]);
+      }
+      else {
+        $services[$name]['enabled'] = TRUE;
       }
     }
     $services = array_merge($services, $disabled_services);
     foreach ($services as $name => $service_info) {
-      // Sanitize
       $machine_name = $service_info['service_name'];
+      // Sanitize
       $service_name = check_plain($service_info['label']);
       $icon_classes_saved = check_plain($service_info['icon_css']);
       $validation_pattern = check_plain($service_info['validation_pattern']);
-      $enabled = $service_info['enabled'];
+      // Set default.
+      $enabled = (bool) $service_info['enabled'];
 
       $dropbuttons = array(
         '#type' => 'dropbutton',
@@ -153,6 +127,37 @@ function socialfield_settings($form, &$form_state) {
     ))
   );
 
+  $form['settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Socialfield Settings'),
+    '#collapsible' => TRUE,
+  );
+  $form['settings']['filled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use filled versions of icons'),
+    '#description' => t('Change this setting and review the icons above.'),
+    '#default_value' => $config->get('filled'),
+  );
+
+  $form['settings']['dont'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Other settings (not necommended)'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['settings']['dont']['new_windows'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Open links in new windows'),
+    '#description' => t('Forcing links to open in new windows makes it difficult for people to find their way back to this site, and is generally bad for accessibility. <br>Enabling this setting could hinder SEO.'),
+    '#default_value'  => $config->get('new_windows'),
+  );
+  $form['settings']['dont']['remove_hidden_text'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Remove hidden labels from social links'),
+    '#description' => t('Including the service name as hidden text is helpful for screen readers. <br>Enabling this setting could hinder SEO.'),
+    '#default_value'  => $config->get('remove_hidden_text'),
+  );
+
   return system_settings_form($form);
 }
 
@@ -196,19 +201,25 @@ function socialfield_service_disable($service) {
 
 /**
  * Form for adding a new service.
+ *
+ * @see _socialfield_service_keys() for current keys.
  */
-function socialfield_service_form($form, $form_state, $service_info = NULL) {
-  if ($service_info == NULL) {
-    // Set empty defaults.
-    $service_info = array(
-      'label' => '',
-      'service_name' => '',
-      'iconapi' => '',
-      'iconapi_fill' => '',
-      'icon_css' => '',
-      'validation_pattern' => '',
-    );
-  }
+function socialfield_service_form($form, $form_state, $service_info = array()) {
+  // Merge with current defaults if empty.
+  $service_info += array(
+    'label' => '',
+    'service_name' => '',
+    'iconapi' => '',
+    'iconapi_fill' => '',
+    'icon_css' => '',
+    'validation_pattern' => '',
+    'enabled' => true,
+  );
+
+  $form['enabled'] = array(
+    '#type' => 'value',
+    '#value' => $service_info['enabled'],
+  );
 
   $form['label'] = array(
     '#type' => 'textfield',
@@ -218,24 +229,28 @@ function socialfield_service_form($form, $form_state, $service_info = NULL) {
   $form['service_name'] = array(
     '#type' => 'machine_name',
     '#title' => t('Service machine name'),
-    '#default_value' => $service_info['service_name'],
-    '#disabled' => TRUE,
     '#machine_name' => array(
       'source' => array('label'),
+      'exists' => 'socialfield_service_exists',
     ),
   );
+  if (!empty($service_info['service_name'])) {
+    $form['service_name']['#default_value'] = $service_info['service_name'];
+    $form['service_name']['#disabled'] = TRUE;
+  }
+
   $iconapi_description = t('See <a href="https://docs.backdropcms.org/documentation/icon-api">the Backdrop Icon API</a> or <a href="https://phosphoricons.com">Phosphor icon list</a>.');
   $form['iconapi'] = array(
     '#type' => 'textfield',
-    '#title' => t('Name of Icon API icon'),
+    '#title' => t('Icon API icon name'),
     '#default_value' => $service_info['iconapi'],
     '#description' => $iconapi_description,
   );
   $form['iconapi_fill'] = array(
     '#type' => 'textfield',
-    '#title' => t('Name of Filled version of Icon API icon'),
+    '#title' => t('Icon API icon name (filled)'),
     '#default_value' => $service_info['iconapi_fill'],
-    '#description' => $iconapi_description,
+    '#description' => t('Add <code>-fill</code> to the end of the Icon API icon name to use the default.'),
   );
   $form['icon_css'] = array(
     '#type' => 'textfield',
@@ -269,33 +284,26 @@ function socialfield_add_service($form, $form_state) {
     '#value' => t('Add'),
   );
 
+  $form['#submit'][] = 'socialfield_service_submit';
+
   return $form;
 }
 
 /**
- * Validates form when adding a new service.
+ * Form submit for adding/editing a service.
  */
-function socialfield_add_service_validate($form, &$form_state) {
-  $services = config_get('socialfield.settings', 'services');
-  if (isset($services[$form_state['values']['service']])) {
-    form_set_error('service', t('This service already exist.'));
-  }
-}
-
-/**
- * Form submit for adding a new service.
- */
-function socialfield_add_service_submit($form, $form_state) {
+function socialfield_service_submit($form, $form_state) {
   $values = &$form_state['values'];
   $services = config_get('socialfield.settings', 'services');
 
-  $service = array(
-    'name' => $values['service_name'],
-    'icon' => $values['service_icon'],
-    'validation_pattern' => $values['service_validation_pattern'],
-  );
+  $service_info = array();
+  foreach (_socialfield_service_keys() as $key) {
+    if (isset($values[$key])) {
+      $service_info[$key] = $values[$key];
+    }
+  }
 
-  $services[$values['service']] = $service;
+  $services[$values['service_name']] = $service_info;
 
   config_set('socialfield.settings', 'services', $services);
   backdrop_goto('admin/config/media/socialfield');
@@ -327,28 +335,10 @@ function socialfield_edit_service($form, $form_state, $service = NULL) {
     '#value' => t('Save'),
   );
 
+  $form['#submit'][] = 'socialfield_service_submit';
+
   return $form;
 }
-
-/**
- * Form submit for editing a service.
- */
-function socialfield_edit_service_submit($form, $form_state) {
-  $values = &$form_state['values'];
-  $services = config_get('socialfield.settings', 'services');
-
-  $service = array(
-    'name' => $values['service_name'],
-    'icon' => $values['service_icon'],
-    'validation_pattern' => $values['service_validation_pattern'],
-  );
-
-  $services[$values['service']] = $service;
-
-  config_set('socialfield.settings', 'services', $services);
-  backdrop_goto('admin/config/media/socialfield');
-}
-
 
 /**
  * Form for deleting a service.
@@ -373,6 +363,7 @@ function socialfield_delete_service($form, $form_state, $service = NULL) {
 
   $question = t('Are you sure you want to delete @service service?', array('@service' => $service));
   $path = 'admin/config/media/socialfield';
+
   return confirm_form($form, $question, $path);
 }
 
@@ -388,4 +379,21 @@ function socialfield_delete_service_submit($form, $form_state) {
   config_set('socialfield.settings', 'services', $services);
   backdrop_set_message(t('@service service was successfully deleted.', array('@service' => $values['service'])));
   backdrop_goto('admin/config/media/socialfield');
+}
+
+/**
+ * Helper function, returns an array of the current properties of a service.
+ *
+ * @return array $keys
+ */
+function _socialfield_service_keys() {
+  return array(
+    "label",
+    "service_name",
+    "iconapi",
+    "iconapi_fill",
+    "icon_css",
+    "validation_pattern",
+    "enabled",
+  );
 }
