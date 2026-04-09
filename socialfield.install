@@ -30,12 +30,12 @@ function socialfield_field_schema($field) {
  * Moves Socialfield settings from variable to config.
  */
 function socialfield_update_1000() {
-  $services = variable_get('socialfield.settings', 'services');
+  $services = update_variable_get('socialfield_services', socialfield_default_services());
   $config = config('socialfield.settings');
   $config->set('services', $services);
   $config->save();
 
-  variable_del('socialfield_services');
+  update_variable_del('socialfield_services');
 }
 
 /**
@@ -44,6 +44,9 @@ function socialfield_update_1000() {
 function socialfield_update_1001() {
   $config = config('socialfield.settings');
   $services = $config->get('services');
+  if (empty($services) || !is_array($services)) {
+    $services = array();
+  }
   $default_services = socialfield_default_services();
 
   foreach ($services as $service_name => $service_info) {
@@ -56,7 +59,7 @@ function socialfield_update_1001() {
       $services[$service_name]['label'] = $services[$service_name]['name'];
       unset($services[$service_name]['name']);
     }
-    // Change the 'icon' key to 'icon_css'
+    // Change the 'icon' key to 'icon_css'.
     if (isset($services[$service_name]['icon'])) {
       $services[$service_name]['icon_css'] = $services[$service_name]['icon'];
       unset($services[$service_name]['icon']);
